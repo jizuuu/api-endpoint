@@ -110,20 +110,34 @@ sequenceDiagram
     participant User
     participant System
 
-    User->>System: GET /packages (Browse Available Packages)
-    System-->>User: Display Available Packages
+    %% Step 1: Check-in & Check-out Date Selection
+    User->>System: GET /calendar (View available dates)
+    System-->>User: Show calendar for selection
 
-    User->>System: POST /bookings (Select Package & Provide Details)
-    System-->>User: Booking Confirmation or Failure
+    User->>System: POST /bookings (Submit Check-in & Check-out Dates)
+    System-->>User: Save Dates & Create Pending Booking ID
 
-    User->>System: GET /users/{id}/bookings (View My Bookings)
-    System-->>User: Display User’s Bookings
+    %% Step 2: Select Package & Rate
+    User->>System: GET /packages (View available packages)
+    System-->>User: List of available packages
 
-    User->>System: GET /bookings/{id} (Check Booking Status)
-    System-->>User: Return Booking Details
+    User->>System: PUT /bookings/{id} (Select a package)
+    System-->>User: Update booking with selected package
 
-    User->>System: DELETE /bookings/{id} (Cancel Booking)
-    System-->>User: Booking Canceled or Error Message
+    %% Step 3: Guest Information
+    User->>System: PUT /bookings/{id} (Enter personal details)
+    System-->>User: Save guest information
+
+    %% Step 4: Payment Processing
+    User->>System: POST /payments (Submit GCASH Reference Code & Payment Terms)
+    System-->>User: Link payment to booking & update status
+
+    %% Step 5: Booking Confirmation
+    User->>System: GET /bookings/{id} (Review booking details)
+    System-->>User: Display booking summary with total amount
+
+    User->>System: PUT /bookings/{id}/status (Accept terms & confirm booking)
+    System-->>User: Booking finalized and status updated
 ```
 ---
 ### Packages Flow
@@ -132,11 +146,11 @@ sequenceDiagram
     participant User
     participant System
 
-    User->>System: GET /content (Browse Available Content)
-    System-->>User: Display Content List
+    User->>System: GET /packages (View available packages)
+    System-->>User: List of all packages
 
-    User->>System: GET /content/{id} (View Specific Content)
-    System-->>User: Return Content Data
+    User->>System: GET /packages/{id} (View package details)
+    System-->>User: Return package information
 ```
 ---
 ### Payment Flow
@@ -161,14 +175,11 @@ sequenceDiagram
     participant User
     participant System
 
-    User->>System: GET /billing/{id} (View My Billing Statement)
-    System-->>User: Display Billing Details
+    User->>System: GET /billing (View all invoices)
+    System-->>User: Return list of invoices
 
-    User->>System: POST /billing (Request Invoice)
-    System-->>User: Invoice Generated
-
-    User->>System: PUT /billing/{id} (Update Billing Info)
-    System-->>User: Billing Updated or Error
+    User->>System: GET /billing/{id} (View specific invoice)
+    System-->>User: Return invoice details
 ```
 ---
 ### Discount Flow
